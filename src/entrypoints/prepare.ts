@@ -46,6 +46,9 @@ async function run() {
     .map((f) => `File: ${f.filename}\n${f.patch ?? ""}`)
     .join("\n\n");
 
+  // Extract the user's comment body if present
+  const commentBody = github.context.payload.comment?.body || "";
+
   const ctx = {
     repo: github.context.repo,
     commentId,
@@ -54,6 +57,7 @@ async function run() {
     body: pr.data.body ?? "",
     diff,
     thread: [] as {author: string; body: string}[],
+    userComment: commentBody || "",
   };
 
   // Collect recent user replies to agent comment for follow-up context
@@ -78,4 +82,4 @@ async function run() {
   core.setOutput("context_file", ctxPath);
 }
 
-run(); 
+run();

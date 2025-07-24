@@ -43,6 +43,7 @@ async function run() {
       prNumber: context.prNumber,
     });
 
+    console.log("🔍 Prompt being sent to Claude/OpenAI:\n", prompt);
     const messages = [
       { role: "user", content: prompt },
     ];
@@ -52,23 +53,22 @@ async function run() {
       if (process.env.LLM_FAKE_RESPONSE) {
         answer = process.env.LLM_FAKE_RESPONSE;
       } else if (provider === "openai") {
+        console.log("🔍 Prompt being sent to Claude/OpenAI:\n", prompt);
         answer = await chatCompletion(messages as any, {
           apiKey: process.env.OPENAI_API_KEY!,
           model,
-          timeoutMs: parsePositiveInteger(
-            core.getInput("timeout_ms") || process.env.TIMEOUT_MS || "60000",
-            "timeout_ms"
-          ),
+          timeoutMs: parseInt(core.getInput("timeout_ms") || process.env.TIMEOUT_MS || "60000", 10),
         });
       } else {
+        console.log("🔍 Prompt being sent to Claude/Anthropic:\n", prompt);
+        if (!process.env.ANTHROPIC_API_KEY) {
+          throw new Error("❌ ANTHROPIC_API_KEY is not set");
+        }
         answer = await anthropicChat(messages as any, {
           apiKey: process.env.ANTHROPIC_API_KEY!,
           model,
           maxTokens: 1024,
-          timeoutMs: parsePositiveInteger(
-            core.getInput("timeout_ms") || process.env.TIMEOUT_MS || "60000",
-            "timeout_ms"
-          ),
+          timeoutMs: parseInt(core.getInput("timeout_ms") || process.env.TIMEOUT_MS || "60000", 10),
         });
       }
     } catch (err: any) {
@@ -106,4 +106,4 @@ async function run() {
   }
 }
 
-run(); 
+run();

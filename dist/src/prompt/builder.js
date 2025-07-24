@@ -33,5 +33,6 @@ function buildPrompt(ctx) {
         .replace("{{TITLE}}", ctx.title)
         .replace("{{BODY}}", ctx.body)
         .replace("{{DIFF}}", diff)
-        .replace("{{THREAD}}", threadContent);
+        .replace("{{THREAD}}", threadContent)
+        .replace("{{COMMENT}}", ctx.userComment || ""); // enhancement: support for follow-up prompts
 }

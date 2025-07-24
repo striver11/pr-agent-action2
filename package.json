@@ -4,7 +4,7 @@
   "type": "module",
   "license": "MIT",
   "scripts": {
-    "build": "bun tsc -p tsconfig.json",
+    "build": "npx tsc -p tsconfig.json",
     "lint": "echo 'no linter yet'",
     "test": "bun test",
     "smoke:anthropic": "bun run scripts/anthropic-smoke.ts 'Hello from Anthropic'",

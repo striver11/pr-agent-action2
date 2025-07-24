@@ -6,8 +6,23 @@ import { readFile } from "fs/promises";
 
 async function run() {
   try {
-    const contextPath = core.getInput("context_file", { required: true });
-    const bodyPath = core.getInput("body_file", { required: true });
+    // Support both GitHub Action inputs and CLI arguments
+    const contextPath =
+      core.getInput("context_file") ||
+      (process.argv.includes("--context_file")
+        ? process.argv[process.argv.indexOf("--context_file") + 1]
+        : undefined);
+
+    const bodyPath =
+      core.getInput("body_file") ||
+      (process.argv.includes("--body_file")
+        ? process.argv[process.argv.indexOf("--body_file") + 1]
+        : undefined);
+
+    if (!contextPath || !bodyPath) {
+      throw new Error("context_file and body_file must be provided either as input or CLI args.");
+    }
+
     const context = JSON.parse(await readFile(contextPath, "utf8"));
     const body = await readFile(bodyPath, "utf8");
 
@@ -23,4 +38,4 @@ async function run() {
   }
 }
 
-run(); 
+run();

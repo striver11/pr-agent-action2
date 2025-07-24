@@ -72,6 +72,7 @@ async function run() {
             repo: context.repo,
             prNumber: context.prNumber,
         });
+        console.log("🔍 Prompt being sent to Claude/OpenAI:\n", prompt);
         const messages = [
             { role: "user", content: prompt },
         ];
@@ -81,18 +82,23 @@ async function run() {
                 answer = process.env.LLM_FAKE_RESPONSE;
             }
             else if (provider === "openai") {
+                console.log("🔍 Prompt being sent to Claude/OpenAI:\n", prompt);
                 answer = await (0, openai_1.chatCompletion)(messages, {
                     apiKey: process.env.OPENAI_API_KEY,
                     model,
-                    timeoutMs: parsePositiveInteger(core.getInput("timeout_ms") || process.env.TIMEOUT_MS || "60000", "timeout_ms"),
+                    timeoutMs: parseInt(core.getInput("timeout_ms") || process.env.TIMEOUT_MS || "60000", 10),
                 });
             }
             else {
+                console.log("🔍 Prompt being sent to Claude/Anthropic:\n", prompt);
+                if (!process.env.ANTHROPIC_API_KEY) {
+                    throw new Error("❌ ANTHROPIC_API_KEY is not set");
+                }
                 answer = await (0, anthropic_1.anthropicChat)(messages, {
                     apiKey: process.env.ANTHROPIC_API_KEY,
                     model,
                     maxTokens: 1024,
-                    timeoutMs: parsePositiveInteger(core.getInput("timeout_ms") || process.env.TIMEOUT_MS || "60000", "timeout_ms"),
+                    timeoutMs: parseInt(core.getInput("timeout_ms") || process.env.TIMEOUT_MS || "60000", 10),
                 });
             }
         }

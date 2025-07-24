@@ -39,8 +39,18 @@ const rest_1 = require("@octokit/rest");
 const promises_1 = require("fs/promises");
 async function run() {
     try {
-        const contextPath = core.getInput("context_file", { required: true });
-        const bodyPath = core.getInput("body_file", { required: true });
+        // Support both GitHub Action inputs and CLI arguments
+        const contextPath = core.getInput("context_file") ||
+            (process.argv.includes("--context_file")
+                ? process.argv[process.argv.indexOf("--context_file") + 1]
+                : undefined);
+        const bodyPath = core.getInput("body_file") ||
+            (process.argv.includes("--body_file")
+                ? process.argv[process.argv.indexOf("--body_file") + 1]
+                : undefined);
+        if (!contextPath || !bodyPath) {
+            throw new Error("context_file and body_file must be provided either as input or CLI args.");
+        }
         const context = JSON.parse(await (0, promises_1.readFile)(contextPath, "utf8"));
         const body = await (0, promises_1.readFile)(bodyPath, "utf8");
         const octokit = new rest_1.Octokit({ auth: process.env.GITHUB_TOKEN });
